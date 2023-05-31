@@ -10,7 +10,6 @@ public class FileManegerWords {
     public static final String words = "src/Files/Words.txt";
     private FileReader fileReader;
     private BufferedReader bufferedReader;
-    private BufferedWriter bufferedWriter;
 
     /**
     * Read the file of the words(Words.txt) and add the Words to arrayWords
