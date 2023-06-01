@@ -8,8 +8,6 @@ import java.io.*;
  * @version v.1.0 date 26/05/2023
  */
 public class FileManagerWriterUsers {
-    private FileReader fileReader;
-    private BufferedReader bufferedReader;
     private FileWriter fileWriter;
     private BufferedWriter bufferedWriter;
 
