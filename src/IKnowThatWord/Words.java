@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Words {
-    private ArrayList<String> words = new ArrayList<>();
+    private ArrayList<String> words;
     public Words(){
         FileManegerWords fileManegerWords = new FileManegerWords();
         words = fileManegerWords.readWords();
