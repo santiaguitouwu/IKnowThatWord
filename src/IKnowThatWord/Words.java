@@ -6,8 +6,8 @@ import java.util.Random;
 public class Words {
     private ArrayList<String> words;
     public Words(){
-        FileManegerWords fileManegerWords = new FileManegerWords();
-        words = fileManegerWords.readWords();
+        FileManager fileManager = new FileManager();
+        words = fileManager.read("src/Files/Words.txt");
     }
     public String getRamdonWord(){
         Random random = new Random();

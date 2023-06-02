@@ -8,16 +8,17 @@ import java.util.ArrayList;
  * @author Santiago Jiménez - Sarah Cardinaux
  * @version v.1.0 date 26/05/2023
  */
-public class FileManagerUsers {
-    private static final String fileUsers = "src/Files/Users.txt";
+public class FileManager {
     private FileReader fileReader;
     private BufferedReader bufferedReader;
+    private FileWriter fileWriter;
+    private BufferedWriter bufferedWriter;
 
-    public ArrayList<String> read(){
+    public ArrayList<String> read(String filePath){
         ArrayList<String> ArrayUsers = new ArrayList<>();
 
         try{
-            fileReader = new FileReader(fileUsers);
+            fileReader = new FileReader(filePath);
             bufferedReader = new BufferedReader(fileReader);
             String line = bufferedReader.readLine();
             while(line != null){
@@ -28,5 +29,16 @@ public class FileManagerUsers {
             throw new RuntimeException(e);
         }
         return ArrayUsers;
+    }
+
+    public void saveUser(String line){
+        try{
+            fileWriter = new FileWriter("src/Files/Users.txt", false);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(line);
+            bufferedWriter.newLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
