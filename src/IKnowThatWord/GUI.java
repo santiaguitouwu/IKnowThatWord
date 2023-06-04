@@ -89,20 +89,8 @@ public class GUI extends JFrame {
         JLabel label = new JLabel();
         contenedorPalabras.add(label);
 
-        final int[] index = {0};
-        String[] palabras = secuenciaPalabras();
-
-        Timer timer = new Timer(5000, e -> {
-            if (index[0] < palabras.length) {
-                label.setText(palabras[index[0]]);
-                index[0]++;
-            } else {
-                ((Timer) e.getSource()).stop(); // Detener el Timer cuando se hayan mostrado todas las palabras
-            }
-        });
-        timer.start();
-
-
+        temporizador(label,5000);
+        
         JButton correcto = new JButton("SI");
         GridBagConstraints gbc4 = new GridBagConstraints();
         gbc4.gridx=0;
@@ -161,6 +149,20 @@ public class GUI extends JFrame {
      */
     private class Escucha {
 
+    }
+
+    public void temporizador (JLabel label, int time ) {
+        final int[] index = {0};
+        String[] palabras = secuenciaPalabras();
+        Timer timer = new Timer(time, e -> {
+            if (index[0] < palabras.length) {
+                label.setText(palabras[index[0]]);
+                index[0]++;
+            } else {
+                ((Timer) e.getSource()).stop(); // Detener el Timer cuando se hayan mostrado todas las palabras
+            }
+        });
+        timer.start();
     }
 
     public String[] secuenciaPalabras() {
