@@ -88,9 +88,10 @@ public class GUI extends JFrame {
 
         JLabel label = new JLabel();
         contenedorPalabras.add(label);
+        String[] palabras = secuenciaPalabras();
 
-        temporizador(label,5000);
-        
+        temporizador(label,5000,palabras);
+
         JButton correcto = new JButton("SI");
         GridBagConstraints gbc4 = new GridBagConstraints();
         gbc4.gridx=0;
@@ -151,9 +152,8 @@ public class GUI extends JFrame {
 
     }
 
-    public void temporizador (JLabel label, int time ) {
+    public void temporizador (JLabel label, int time, String[] palabras ) {
         final int[] index = {0};
-        String[] palabras = secuenciaPalabras();
         Timer timer = new Timer(time, e -> {
             if (index[0] < palabras.length) {
                 label.setText(palabras[index[0]]);
