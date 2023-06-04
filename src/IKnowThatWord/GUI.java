@@ -60,7 +60,7 @@ public class GUI extends JFrame {
         JButton help = new JButton("?");
         GridBagConstraints gbc1 = new GridBagConstraints();
         gbc1.gridx=0;
-        gbc1.gridy=1;
+        gbc1.gridy=0;
         gbc1.gridwidth=1;
         gbc1.fill=GridBagConstraints.NONE;
         gbc1.anchor=GridBagConstraints.LINE_START;
@@ -69,7 +69,7 @@ public class GUI extends JFrame {
         JButton salir = new JButton("Salir");
         GridBagConstraints gbc2 = new GridBagConstraints();
         gbc2.gridx=3;
-        gbc2.gridy=1;
+        gbc2.gridy=0;
         gbc2.gridwidth=1;
         gbc2.fill=GridBagConstraints.NONE;
         gbc2.anchor=GridBagConstraints.LINE_END;
@@ -90,7 +90,18 @@ public class GUI extends JFrame {
         contenedorPalabras.add(label);
         String[] palabras = secuenciaPalabras();
 
-        temporizador(label,5000,palabras);
+        JButton continuar = new JButton("Continuar");
+        GridBagConstraints gbc7 = new GridBagConstraints();
+        gbc7.gridx=0;
+        gbc7.gridy=3;
+        gbc7.gridwidth=2;
+        gbc7.weightx=0.5;
+        gbc7.fill=GridBagConstraints.BOTH;
+        gbc7.anchor=GridBagConstraints.CENTER;
+        this.getContentPane().add(continuar, gbc7);
+        continuar.setEnabled(false);
+
+        temporizador(label,5000,palabras,continuar);
 
         JButton correcto = new JButton("SI");
         GridBagConstraints gbc4 = new GridBagConstraints();
@@ -101,6 +112,7 @@ public class GUI extends JFrame {
         gbc4.fill=GridBagConstraints.BOTH;
         gbc4.anchor=GridBagConstraints.CENTER;
         this.getContentPane().add(correcto, gbc4);
+        correcto.setEnabled(false);
 
         JButton incorrecto = new JButton("NO");
         GridBagConstraints gbc5 = new GridBagConstraints();
@@ -111,6 +123,7 @@ public class GUI extends JFrame {
         gbc5.fill=GridBagConstraints.BOTH;
         gbc5.anchor=GridBagConstraints.CENTER;
         this.getContentPane().add(incorrecto, gbc5);
+        incorrecto.setEnabled(false);
 
 
         JPanel contenedorNivel = new JPanel();
@@ -152,13 +165,14 @@ public class GUI extends JFrame {
 
     }
 
-    public void temporizador (JLabel label, int time, String[] palabras ) {
+    public void temporizador (JLabel label, int time, String[] palabras, JButton continuar ) {
         final int[] index = {0};
         Timer timer = new Timer(time, e -> {
             if (index[0] < palabras.length) {
                 label.setText(palabras[index[0]]);
                 index[0]++;
             } else {
+                continuar.setEnabled(true);
                 ((Timer) e.getSource()).stop(); // Detener el Timer cuando se hayan mostrado todas las palabras
             }
         });
