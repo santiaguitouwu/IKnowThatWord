@@ -2,8 +2,7 @@ package IKnowThatWord;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.Timer;
 
 /**
  * This class is used for ...
@@ -15,6 +14,8 @@ public class GUI extends JFrame {
     private Header header;
     private JButton correcto, incorrecto, ayuda, salir;
     private JPanel palabras, nivel, nombre;
+    private Words words;
+    private Levels levels;
 
     /**
      * Constructor of myProject.GUI class
@@ -74,16 +75,32 @@ public class GUI extends JFrame {
         gbc2.anchor=GridBagConstraints.LINE_END;
         this.getContentPane().add(salir, gbc2);
 
-        JPanel palabras = new JPanel();
-        palabras.setPreferredSize(new Dimension(450,200));
-        palabras.setBorder(BorderFactory.createTitledBorder("Palabras a Memorizar:"));
+        JPanel contenedorPalabras = new JPanel();
+        contenedorPalabras.setPreferredSize(new Dimension(450,200));
+        contenedorPalabras.setBorder(BorderFactory.createTitledBorder("Palabras a Memorizar:"));
         GridBagConstraints gbc3 = new GridBagConstraints();
         gbc3.gridx=0;
         gbc3.gridy=2;
         gbc3.gridwidth=2;
         gbc3.fill=GridBagConstraints.BOTH;
         gbc3.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(palabras,gbc3);
+        this.getContentPane().add(contenedorPalabras,gbc3);
+
+        JLabel label = new JLabel();
+        contenedorPalabras.add(label);
+
+        final int[] index = {0};
+        String[] palabras = secuenciaPalabras();
+
+        Timer timer = new Timer(5000, e -> {
+            if (index[0] < palabras.length) {
+                label.setText(palabras[index[0]]);
+                index[0]++;
+            } else {
+                ((Timer) e.getSource()).stop(); // Detener el Timer cuando se hayan mostrado todas las palabras
+            }
+        });
+        timer.start();
 
 
         JButton correcto = new JButton("SI");
@@ -107,23 +124,23 @@ public class GUI extends JFrame {
         this.getContentPane().add(incorrecto, gbc5);
 
 
-
-        JPanel nombre = new JPanel();
-        nombre.setPreferredSize(new Dimension(450,200));
-        nombre.setBorder(BorderFactory.createTitledBorder("Nivel y Jugador:"));
+        JPanel contenedorNivel = new JPanel();
+        contenedorNivel.setPreferredSize(new Dimension(450,200));
+        contenedorNivel.setBorder(BorderFactory.createTitledBorder("Nivel:"));
         GridBagConstraints gbc6 = new GridBagConstraints();
         gbc6.gridx=0;
         gbc6.gridy=5;
         gbc6.gridwidth=2;
         gbc6.fill=GridBagConstraints.BOTH;
         gbc6.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(nombre,gbc6);
+        this.getContentPane().add(contenedorNivel,gbc6);
 
+        //se debe obtener los niveles del archivo y pasarlo como parametro de entrada de la clase level
+        levels = new Levels(1);
 
+        JLabel labelLevel = new JLabel(String.valueOf(levels.getLevel()));
+        contenedorNivel.add(labelLevel);
 
-
-
-        //Change this line if you change JFrame Container's Layout
 
 
     }
@@ -145,4 +162,13 @@ public class GUI extends JFrame {
     private class Escucha {
 
     }
+
+    public String[] secuenciaPalabras() {
+        words = new Words();
+        int level = 1;
+        String[] palabras = words.getWords(level);
+        //System.out.println(palabras[4]);
+
+        return palabras ;
+        }
 }
