@@ -194,8 +194,9 @@ public class GUI extends JFrame {
     }
 
     public void temporizador (JLabel label, int time, String[] palabras, JButton button ) {
+        label.setText(palabras[0]);
         System.out.println("tempo");
-        final int[] index = {0};
+        final int[] index = {1};
         Timer timer = new Timer(time, e -> {
             if (index[0] < palabras.length) {
                 //currentWord = palabras[index[0]];
