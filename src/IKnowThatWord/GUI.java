@@ -3,6 +3,8 @@ package IKnowThatWord;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * This class is used for ...
@@ -143,7 +145,9 @@ public class GUI extends JFrame {
         JLabel labelLevel = new JLabel(String.valueOf(levels.getLevel()));
         contenedorNivel.add(labelLevel);
 
-
+        JButton nivel = new JButton("Siguiente nivel");
+        contenedorNivel.add(nivel);
+        nivel.setEnabled(false);
 
     }
 
