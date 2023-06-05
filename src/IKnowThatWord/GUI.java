@@ -114,13 +114,14 @@ public class GUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Método que deseas ejecutar
                 cambioPantalla();
-
+                JButton botonClickeado = (JButton) e.getSource();
+                botonClickeado.setEnabled(false);
             }
         });
 
         temporizador(this.labelMain,5000,this.palabrasCorrectas,continuar);
 
-        JButton correcto = new JButton("SI");
+        this.correcto = new JButton("SI");
         GridBagConstraints gbc4 = new GridBagConstraints();
         gbc4.gridx=0;
         gbc4.gridy=4;
@@ -128,10 +129,10 @@ public class GUI extends JFrame {
         gbc4.weightx=0.5;
         gbc4.fill=GridBagConstraints.BOTH;
         gbc4.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(correcto, gbc4);
-        correcto.setEnabled(true);
+        this.getContentPane().add(this.correcto, gbc4);
+        this.correcto.setEnabled(false);
 
-        correcto.addActionListener(new ActionListener() {
+        this.correcto.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 calcularPuntaje();
@@ -195,11 +196,15 @@ public class GUI extends JFrame {
 
     public void temporizador (JLabel label, int time, String[] palabras, JButton button ) {
         label.setText(palabras[0]);
+        this.currentWord = palabras[0];
         System.out.println("tempo");
         final int[] index = {1};
         Timer timer = new Timer(time, e -> {
-            if (index[0] < palabras.length) {
-                //currentWord = palabras[index[0]];
+            if (index[0] < palabras.length ) {
+                if (time == 7000 && this.correcto.isEnabled()==false){
+                    this.correcto.setEnabled(true);
+                }
+                this.currentWord = palabras[index[0]];
                 label.setText(palabras[index[0]]);
                 index[0]++;
             } else {
@@ -223,13 +228,15 @@ public class GUI extends JFrame {
         String[] palabrasCorrectas = this.palabrasCorrectas;
         String currentWord = this.currentWord;
         int puntajeTotal = this.puntaje;
+       // tring[] palabras = {"oe","hola"};
+        //words = new String[] {"hola","como"} ;
 
         for ( String palabra : palabrasCorrectas) {
+            System.out.println("step1 " + palabra);
+            System.out.println("step2 " + currentWord);
 
             if (palabra.equals(currentWord)) {
                 this.puntaje++;
-                System.out.println(palabra);
-                System.out.println(currentWord);
                 System.out.println(this.puntaje);
                 // La palabra fue encontrada en el arreglo
             }
