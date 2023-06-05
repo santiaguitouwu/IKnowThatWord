@@ -174,6 +174,15 @@ public class GUI extends JFrame {
         contenedorNivel.add(this.nextLevel);
         //this.nextLevel.setEnabled(false);
 
+        this.nextLevel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                validarPuntaje();
+                JButton botonClickeado = (JButton) e.getSource();
+                botonClickeado.setEnabled(false);
+            }
+        });
+
     }
 
     /**
@@ -214,10 +223,12 @@ public class GUI extends JFrame {
         });
         timer.start();
     }
+
     private void cambioPantalla(){
+        this.correcto.setEnabled(true);
         this.labelMain.setText("");
         this.contenedorPalabras.setBorder(BorderFactory.createTitledBorder("Que palabra recuerdas:"));
-        String[] palabras = {"oe","casa","pedo","hola"};
+        String[] palabras = {"hola","como","pero","cosa","televisor","casa","carro","moto"};
         temporizador(this.labelMain,7000,palabras,this.nextLevel);
         System.out.println("El botón ha sido clickeado");
         System.out.println("El botón ha sido cslickeado2");
@@ -227,21 +238,25 @@ public class GUI extends JFrame {
     private void calcularPuntaje(){
         String[] palabrasCorrectas = this.palabrasCorrectas;
         String currentWord = this.currentWord;
-        int puntajeTotal = this.puntaje;
-       // tring[] palabras = {"oe","hola"};
-        //words = new String[] {"hola","como"} ;
 
         for ( String palabra : palabrasCorrectas) {
-            System.out.println("step1 " + palabra);
-            System.out.println("step2 " + currentWord);
-
             if (palabra.equals(currentWord)) {
                 this.puntaje++;
                 System.out.println(this.puntaje);
-                // La palabra fue encontrada en el arreglo
             }
-
         }
+    }
+    private void validarPuntaje(){
+        int maxPuntaje = this.palabrasCorrectas.length;
+        int minPuntaje = (int) (maxPuntaje * 0.7);
+        System.out.println(minPuntaje);
+        if (this.puntaje >= minPuntaje){
+            System.out.println("GANASTE");
+        }
+        else {
+            System.out.println("PERDISTE");
+        }
+
     }
 
     public String[] obtenerPalabrasCorrectas() {
