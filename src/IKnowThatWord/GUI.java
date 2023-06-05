@@ -3,6 +3,8 @@ package IKnowThatWord;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * This class is used for ...
@@ -16,6 +18,13 @@ public class GUI extends JFrame {
     private JPanel palabras, nivel, nombre;
     private Words words;
     private Levels levels;
+    private String[] palabrasCorrectas ;
+    private String currentWord;
+    private int puntaje =0;
+    private JLabel labelMain;
+    private JButton nextLevel;
+    private JPanel contenedorPalabras;
+
 
     /**
      * Constructor of myProject.GUI class
@@ -31,7 +40,6 @@ public class GUI extends JFrame {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //this.setLayout(new GridBagLayout());
-
 
     }
 
@@ -60,7 +68,7 @@ public class GUI extends JFrame {
         JButton help = new JButton("?");
         GridBagConstraints gbc1 = new GridBagConstraints();
         gbc1.gridx=0;
-        gbc1.gridy=1;
+        gbc1.gridy=0;
         gbc1.gridwidth=1;
         gbc1.fill=GridBagConstraints.NONE;
         gbc1.anchor=GridBagConstraints.LINE_START;
@@ -69,41 +77,51 @@ public class GUI extends JFrame {
         JButton salir = new JButton("Salir");
         GridBagConstraints gbc2 = new GridBagConstraints();
         gbc2.gridx=3;
-        gbc2.gridy=1;
+        gbc2.gridy=0;
         gbc2.gridwidth=1;
         gbc2.fill=GridBagConstraints.NONE;
         gbc2.anchor=GridBagConstraints.LINE_END;
         this.getContentPane().add(salir, gbc2);
 
-        JPanel contenedorPalabras = new JPanel();
-        contenedorPalabras.setPreferredSize(new Dimension(450,200));
-        contenedorPalabras.setBorder(BorderFactory.createTitledBorder("Palabras a Memorizar:"));
+        this.contenedorPalabras = new JPanel();
+        this.contenedorPalabras.setPreferredSize(new Dimension(450,200));
+        this.contenedorPalabras.setBorder(BorderFactory.createTitledBorder("Palabras a Memorizar:"));
         GridBagConstraints gbc3 = new GridBagConstraints();
         gbc3.gridx=0;
         gbc3.gridy=2;
         gbc3.gridwidth=2;
         gbc3.fill=GridBagConstraints.BOTH;
         gbc3.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(contenedorPalabras,gbc3);
+        this.getContentPane().add(this.contenedorPalabras,gbc3);
 
-        JLabel label = new JLabel();
-        contenedorPalabras.add(label);
+        this.labelMain = new JLabel();
+        this.contenedorPalabras.add(this.labelMain);
 
-        final int[] index = {0};
-        String[] palabras = secuenciaPalabras();
+        this.palabrasCorrectas= obtenerPalabrasCorrectas();
 
-        Timer timer = new Timer(5000, e -> {
-            if (index[0] < palabras.length) {
-                label.setText(palabras[index[0]]);
-                index[0]++;
-            } else {
-                ((Timer) e.getSource()).stop(); // Detener el Timer cuando se hayan mostrado todas las palabras
+        JButton continuar = new JButton("Continuar");
+        GridBagConstraints gbc7 = new GridBagConstraints();
+        gbc7.gridx=0;
+        gbc7.gridy=3;
+        gbc7.gridwidth=2;
+        gbc7.weightx=0.5;
+        gbc7.fill=GridBagConstraints.BOTH;
+        gbc7.anchor=GridBagConstraints.CENTER;
+        this.getContentPane().add(continuar, gbc7);
+        continuar.setEnabled(false);
+        continuar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Método que deseas ejecutar
+                cambioPantalla();
+                JButton botonClickeado = (JButton) e.getSource();
+                botonClickeado.setEnabled(false);
             }
         });
-        timer.start();
 
+        temporizador(this.labelMain,5000,this.palabrasCorrectas,continuar);
 
-        JButton correcto = new JButton("SI");
+        this.correcto = new JButton("SI");
         GridBagConstraints gbc4 = new GridBagConstraints();
         gbc4.gridx=0;
         gbc4.gridy=4;
@@ -111,7 +129,17 @@ public class GUI extends JFrame {
         gbc4.weightx=0.5;
         gbc4.fill=GridBagConstraints.BOTH;
         gbc4.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(correcto, gbc4);
+        this.getContentPane().add(this.correcto, gbc4);
+        this.correcto.setEnabled(false);
+
+        this.correcto.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                calcularPuntaje();
+                JButton botonClickeado = (JButton) e.getSource();
+                botonClickeado.setEnabled(false);
+            }
+        });
 
         JButton incorrecto = new JButton("NO");
         GridBagConstraints gbc5 = new GridBagConstraints();
@@ -122,6 +150,7 @@ public class GUI extends JFrame {
         gbc5.fill=GridBagConstraints.BOTH;
         gbc5.anchor=GridBagConstraints.CENTER;
         this.getContentPane().add(incorrecto, gbc5);
+        incorrecto.setEnabled(false);
 
 
         JPanel contenedorNivel = new JPanel();
@@ -141,7 +170,18 @@ public class GUI extends JFrame {
         JLabel labelLevel = new JLabel(String.valueOf(levels.getLevel()));
         contenedorNivel.add(labelLevel);
 
+        this.nextLevel   = new JButton("Siguiente nivel");
+        contenedorNivel.add(this.nextLevel);
+        this.nextLevel.setEnabled(false);
 
+        this.nextLevel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                validarPuntaje();
+                JButton botonClickeado = (JButton) e.getSource();
+                botonClickeado.setEnabled(false);
+            }
+        });
 
     }
 
@@ -162,15 +202,68 @@ public class GUI extends JFrame {
     private class Escucha {
 
     }
-/*
-    public String[] secuenciaPalabras() {
+
+    public void temporizador (JLabel label, int time, String[] palabras, JButton button ) {
+        label.setText(palabras[0]);
+        this.currentWord = palabras[0];
+        System.out.println("tempo");
+        final int[] index = {1};
+        Timer timer = new Timer(time, e -> {
+            if (index[0] < palabras.length ) {
+                if (time == 7000 && this.correcto.isEnabled()==false){
+                    this.correcto.setEnabled(true);
+                }
+                this.currentWord = palabras[index[0]];
+                label.setText(palabras[index[0]]);
+                index[0]++;
+            } else {
+                button.setEnabled(true);
+                ((Timer) e.getSource()).stop(); // Detener el Timer cuando se hayan mostrado todas las palabras
+            }
+        });
+        timer.start();
+    }
+
+    private void cambioPantalla(){
+        this.correcto.setEnabled(true);
+        this.labelMain.setText("");
+        this.contenedorPalabras.setBorder(BorderFactory.createTitledBorder("Que palabra recuerdas:"));
+        String[] palabras = {"hola","como","pero","cosa","televisor","casa","carro","moto"};
+        temporizador(this.labelMain,7000,palabras,this.nextLevel);
+        System.out.println("El botón ha sido clickeado");
+        System.out.println("El botón ha sido cslickeado2");
+
+    }
+
+    private void calcularPuntaje(){
+        String[] palabrasCorrectas = this.palabrasCorrectas;
+        String currentWord = this.currentWord;
+
+        for ( String palabra : palabrasCorrectas) {
+            if (palabra.equals(currentWord)) {
+                this.puntaje++;
+                System.out.println(this.puntaje);
+            }
+        }
+    }
+    private void validarPuntaje(){
+        int maxPuntaje = this.palabrasCorrectas.length;
+        int minPuntaje = (int) (maxPuntaje * 0.7);
+        System.out.println(minPuntaje);
+        if (this.puntaje >= minPuntaje){
+            System.out.println("GANASTE");
+        }
+        else {
+            System.out.println("PERDISTE");
+        }
+
+    }
+
+    public String[] obtenerPalabrasCorrectas() {
         words = new Words();
         int level = 1;
         String[] palabras = words.getWords(level);
-        //System.out.println(palabras[4]);
 
         return palabras ;
         }
-
- */
 }
