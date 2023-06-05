@@ -172,7 +172,7 @@ public class GUI extends JFrame {
 
         this.nextLevel   = new JButton("Siguiente nivel");
         contenedorNivel.add(this.nextLevel);
-        //this.nextLevel.setEnabled(false);
+        this.nextLevel.setEnabled(false);
 
         this.nextLevel.addActionListener(new ActionListener() {
             @Override
@@ -263,7 +263,6 @@ public class GUI extends JFrame {
         words = new Words();
         int level = 1;
         String[] palabras = words.getWords(level);
-        //System.out.println(palabras[4]);
 
         return palabras ;
         }
