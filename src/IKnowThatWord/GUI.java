@@ -162,7 +162,7 @@ public class GUI extends JFrame {
     private class Escucha {
 
     }
-
+/*
     public String[] secuenciaPalabras() {
         words = new Words();
         int level = 1;
@@ -171,4 +171,6 @@ public class GUI extends JFrame {
 
         return palabras ;
         }
+
+ */
 }

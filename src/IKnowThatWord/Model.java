@@ -86,6 +86,13 @@ Set up the number of words depending on the level
                 break;
         }
     }
+
+    /**
+     * increase the level in 1, pass to the next level
+     */
+    public void nextLevel(){
+        currentLevel++;
+    }
     /**
     * Select the words to show to the user for be memorized
      * @return a arrayList with the words for memorize
@@ -129,7 +136,7 @@ Set up the number of words depending on the level
     /**
      * clean the arrays
      */
-    public void cleanArrays(){
+    public void clearArrays(){
         memorizeWords.clear();
         memorizeWords.add(words.getRamdonWord());
         allWords.clear();
