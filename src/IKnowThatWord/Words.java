@@ -30,9 +30,9 @@ public class Words {
         String infoUser = this.fileManager.retornaUsuario(this.user);
         String nivelUsuario = infoUser.split(",")[1];
         this.nivel = Integer.parseInt(nivelUsuario);
-        this.palabrasCorrectas = fileManager.lecturaFile("src/myProject/diccionario/wordsOk.txt",nivel);
+        this.palabrasCorrectas = fileManager.lecturaFile("src/Files/WordsSI.txt",nivel);
         Collections.shuffle(palabrasCorrectas);
-        this.palabrasIncorrectas = fileManager.lecturaFile("src/myProject/diccionario/wordsNok.txt",nivel);
+        this.palabrasIncorrectas = fileManager.lecturaFile("src/Files/WordsNO.txt",nivel);
         Collections.shuffle(palabrasIncorrectas);
         listaCombinada = new ArrayList<>();
         listaCombinada.addAll(palabrasCorrectas);
