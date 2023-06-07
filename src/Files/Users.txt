@@ -1,4 +1,6 @@
-Santiago,1
+Santiago,2
 Sarah,5
 Carlos,9
 Juan,6
+shi,1
+Jenny,1
