@@ -111,9 +111,6 @@ public class GUI extends JFrame {
         si.setVisible(false);
         no.setVisible(false);
 
-
-        Image img = Toolkit.getDefaultToolkit().getImage("src/myProject/resources/bg.png");
-
         areaPuntaje = new JTextArea(3, 28);
         areaPuntaje.setBorder(BorderFactory.createTitledBorder("Información"));
         constraints.gridx = 0;

@@ -119,7 +119,7 @@ public class FileManager {
      */
     public void actualizarUsuario(String linea, int nivel){
         try {
-            Path p = Paths.get("src/Files/Words.txt");
+            Path p = Paths.get("src/Files/Users.txt");
             File init = new File(p.toUri());
             File tmp = new File(init.getAbsolutePath() + ".tmp");
 
