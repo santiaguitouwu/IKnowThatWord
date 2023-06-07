@@ -3,8 +3,8 @@ package IKnowThatWord;
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.Timer;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.util.ArrayList;
 
 /**
  * This class is used for ...
@@ -13,19 +13,13 @@ import java.awt.event.ActionListener;
  */
 public class GUI extends JFrame {
 
-    private Header header;
-    private JButton correcto, incorrecto, ayuda, salir;
-    private JPanel palabras, nivel, nombre;
-    private Words words;
-    private Levels levels;
-    private String[] palabrasCorrectas ;
-    private String currentWord;
-    private int puntaje =0;
-    private JLabel labelMain;
-    private JButton nextLevel;
-    private JPanel contenedorPalabras;
-
-
+    private JTextArea areaPuntaje;
+    private JLabel sesion, palabras, indicadorNivel;
+    private JButton si, no, instrucciones, empezar, iniciar;
+    private JTextField nombredeUsuario;
+    private Escucha escucha;
+    private FileManager fileManager;
+    private Timer timerRecordar, timerAdivinar, timer1, timer2, timer3;
     /**
      * Constructor of myProject.GUI class
      */
@@ -33,12 +27,14 @@ public class GUI extends JFrame {
         initGUI();
 
         //Default JFrame configuration
-        this.setTitle("I Know That Word");
-        this.pack();
-        this.setResizable(true);
+        this.setTitle("I KNOW THAT WORD");
+        this.setSize(600, 500);
+        //this.pack();
+        this.setResizable(false);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.getContentPane().setBackground(new Color(71,120,177));
         //this.setLayout(new GridBagLayout());
 
     }
@@ -51,144 +47,122 @@ public class GUI extends JFrame {
     private void initGUI() {
         //Set up JFrame Container's Layout
         this.getContentPane().setLayout(new GridBagLayout());
-        //Create Listener Object and Control Object
-        //Set up JComponent
-        //JPanel panelHeader = new JPanel();
-        //panelHeader.setLayout(new GridBagLayout());
-        header = new Header("I Know That Word", Color.BLACK);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx=0;
-        gbc.gridy=0;
-        gbc.fill=GridBagConstraints.BOTH;
-        gbc.anchor=GridBagConstraints.CENTER;
-        gbc.gridwidth=4;
+        GridBagConstraints constraints = new GridBagConstraints();
+        escucha = new Escucha();
+        fileManager = new FileManager();
 
-        this.getContentPane().add(header,gbc);
+        sesion = new JLabel("Ingresa tu nombre");
+        sesion.setFont(new Font("Regular", Font.PLAIN, 25));
+        sesion.setForeground(new Color(255, 255, 255));
 
-        JButton help = new JButton("?");
-        GridBagConstraints gbc1 = new GridBagConstraints();
-        gbc1.gridx=0;
-        gbc1.gridy=0;
-        gbc1.gridwidth=1;
-        gbc1.fill=GridBagConstraints.NONE;
-        gbc1.anchor=GridBagConstraints.LINE_START;
-        this.getContentPane().add(help, gbc1);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.anchor = GridBagConstraints.PAGE_START;
+        constraints.insets = new Insets(0, 0, 100, 0);
+        add(sesion, constraints);
 
-        JButton salir = new JButton("Salir");
-        GridBagConstraints gbc2 = new GridBagConstraints();
-        gbc2.gridx=3;
-        gbc2.gridy=0;
-        gbc2.gridwidth=1;
-        gbc2.fill=GridBagConstraints.NONE;
-        gbc2.anchor=GridBagConstraints.LINE_END;
-        this.getContentPane().add(salir, gbc2);
+        nombredeUsuario = new JTextField();
+        nombredeUsuario.setPreferredSize(new Dimension(200, 30));
 
-        this.contenedorPalabras = new JPanel();
-        this.contenedorPalabras.setPreferredSize(new Dimension(450,200));
-        this.contenedorPalabras.setBorder(BorderFactory.createTitledBorder("Palabras a Memorizar:"));
-        GridBagConstraints gbc3 = new GridBagConstraints();
-        gbc3.gridx=0;
-        gbc3.gridy=2;
-        gbc3.gridwidth=2;
-        gbc3.fill=GridBagConstraints.BOTH;
-        gbc3.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(this.contenedorPalabras,gbc3);
-
-        this.labelMain = new JLabel();
-        this.contenedorPalabras.add(this.labelMain);
-
-        this.palabrasCorrectas= obtenerPalabrasCorrectas();
-
-        JButton continuar = new JButton("Continuar");
-        GridBagConstraints gbc7 = new GridBagConstraints();
-        gbc7.gridx=0;
-        gbc7.gridy=3;
-        gbc7.gridwidth=2;
-        gbc7.weightx=0.5;
-        gbc7.fill=GridBagConstraints.BOTH;
-        gbc7.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(continuar, gbc7);
-        continuar.setEnabled(false);
-        continuar.addActionListener(new ActionListener() {
+        nombredeUsuario.addKeyListener(new KeyAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                // Método que deseas ejecutar
-                cambioPantalla();
-                JButton botonClickeado = (JButton) e.getSource();
-                botonClickeado.setEnabled(false);
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                if (e.getKeyChar()==','){
+                    e.consume();
+                }
             }
         });
+        constraints.gridy = 1;
+        constraints.anchor = GridBagConstraints.CENTER;
+        constraints.insets = new Insets(80, 0, 40, 0);
+        add(nombredeUsuario, constraints);
 
-        temporizador(this.labelMain,5000,this.palabrasCorrectas,continuar);
+        empezar = new JButton("Empezar");
+        empezar.addActionListener(escucha);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.insets = new Insets(0, 0, 0, 0);
+        add(empezar, constraints);
 
-        this.correcto = new JButton("SI");
-        GridBagConstraints gbc4 = new GridBagConstraints();
-        gbc4.gridx=0;
-        gbc4.gridy=4;
-        gbc4.gridwidth=1;
-        gbc4.weightx=0.5;
-        gbc4.fill=GridBagConstraints.BOTH;
-        gbc4.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(this.correcto, gbc4);
-        this.correcto.setEnabled(false);
+        instrucciones = new JButton("Como Jugar");
+        instrucciones.setVisible(false);
+        instrucciones.addActionListener(escucha);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.insets = new Insets(30, 0, 30, 0);
+        add(instrucciones, constraints);
 
-        this.correcto.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                calcularPuntaje();
-                JButton botonClickeado = (JButton) e.getSource();
-                botonClickeado.setEnabled(false);
-            }
-        });
+        si = new JButton("      Si      ");
+        si.addActionListener(escucha);
+        si.setVisible(false);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.insets = new Insets(0, 0, 0, 135);
+        add(si, constraints);
 
-        JButton incorrecto = new JButton("NO");
-        GridBagConstraints gbc5 = new GridBagConstraints();
-        gbc5.gridx=1;
-        gbc5.gridy=4;
-        gbc5.gridwidth=1;
-        gbc5.weightx=0.5;
-        gbc5.fill=GridBagConstraints.BOTH;
-        gbc5.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(incorrecto, gbc5);
-        incorrecto.setEnabled(false);
+        no = new JButton("      No      ");
+        no.setVisible(false);
+        no.addActionListener(escucha);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.insets = new Insets(0, 115, 0, 0);
+        add(no, constraints);
+        si.setVisible(false);
+        no.setVisible(false);
 
 
-        JPanel contenedorNivel = new JPanel();
-        contenedorNivel.setPreferredSize(new Dimension(450,200));
-        contenedorNivel.setBorder(BorderFactory.createTitledBorder("Nivel:"));
-        GridBagConstraints gbc6 = new GridBagConstraints();
-        gbc6.gridx=0;
-        gbc6.gridy=5;
-        gbc6.gridwidth=2;
-        gbc6.fill=GridBagConstraints.BOTH;
-        gbc6.anchor=GridBagConstraints.CENTER;
-        this.getContentPane().add(contenedorNivel,gbc6);
+        Image img = Toolkit.getDefaultToolkit().getImage("src/myProject/resources/bg.png");
 
-        //se debe obtener los niveles del archivo y pasarlo como parametro de entrada de la clase level
-        levels = new Levels(1);
+        areaPuntaje = new JTextArea(3, 28);
+        areaPuntaje.setBorder(BorderFactory.createTitledBorder("Información"));
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 1;
+        constraints.insets = new Insets(160, 0, 0, 0);
+        constraints.anchor = GridBagConstraints.CENTER;
+        add(areaPuntaje, constraints);
+        areaPuntaje.setEditable(false);
+        areaPuntaje.setVisible(false);
 
-        JLabel labelLevel = new JLabel(String.valueOf(levels.getLevel()));
-        contenedorNivel.add(labelLevel);
+        iniciar = new JButton("Iniciar");
+        iniciar.setVisible(false);
+        iniciar.addActionListener(escucha);
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 1;
+        constraints.insets = new Insets(0, 0, 0, 0);
+        add(iniciar, constraints);
 
-        this.nextLevel   = new JButton("Siguiente nivel");
-        contenedorNivel.add(this.nextLevel);
-        this.nextLevel.setEnabled(false);
+        palabras = new JLabel("Memoriza las siguientes palabras:");
+        palabras.setFont(new Font("Regular", Font.PLAIN, 35));
+        palabras.setVisible(false);
+        palabras.setForeground(new Color(255, 255, 255));
+        constraints.insets = new Insets(100,0,0,0);
+        add(palabras, constraints);
 
-        this.nextLevel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                validarPuntaje();
-                JButton botonClickeado = (JButton) e.getSource();
-                botonClickeado.setEnabled(false);
-            }
-        });
+        indicadorNivel = new JLabel("");
+        indicadorNivel.setFont(new Font("Regular", Font.PLAIN, 30));
+        indicadorNivel.setVisible(false);
+        indicadorNivel.setForeground(new Color(255, 255, 255));
+        constraints.gridx=0;
+        constraints.gridy=0;
+        constraints.insets = new Insets(0,0,120,0);
+        add(indicadorNivel,constraints);
+
+
+        timer1 = new Timer(300, escucha);
+        timer2 = new Timer(300, escucha);
+        timer3= new Timer(0,escucha);
+        timerAdivinar = new Timer(7000, escucha);
+        timerRecordar = new Timer(5000, escucha);
 
     }
 
     /**
      * Main process of the Java program
      * @param args Object used in order to send input data from command line when
-     *             the program is execute by console.
+     *             the program is executed by console.
      */
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -199,71 +173,130 @@ public class GUI extends JFrame {
     /**
      * inner class that extends an Adapter Class or implements Listeners used by GUI class
      */
-    private class Escucha {
+    private class Escucha implements ActionListener {
+        private Words controlWord;
+        private int counter;
 
-    }
+        @Override
+        public void actionPerformed(ActionEvent e) {
 
-    public void temporizador (JLabel label, int time, String[] palabras, JButton button ) {
-        label.setText(palabras[0]);
-        this.currentWord = palabras[0];
-        System.out.println("tempo");
-        final int[] index = {1};
-        Timer timer = new Timer(time, e -> {
-            if (index[0] < palabras.length ) {
-                if (time == 7000 && this.correcto.isEnabled()==false){
-                    this.correcto.setEnabled(true);
+
+            if (e.getSource() == instrucciones) {
+                JOptionPane.showMessageDialog(null, "En cada nivel al comienzo se mostrará una serie de palabras," +"\n"+
+                        "tendrás que memorizarlas, luego se mostrarán mezcladas junto" +"\n"+
+                        "con otras palabras, tendrás que decidir cuales pertenecen al" +"\n"+
+                        "conjunto inicial. La cantidad de aciertos que necesitas corresponde"+"\n"+ " al 70% del total de las palabras mostradas.");
+
+            } else if (e.getSource() == empezar) {
+                //Guarda los datos en un archivo de texto
+                fileManager.agregarUsuario(nombredeUsuario.getText(), 1);
+                iniciar.setVisible(true);
+                instrucciones.setVisible(true);
+                nombredeUsuario.setVisible(false);
+                empezar.setVisible(false);
+                sesion.setVisible(false);
+
+            }
+            if (e.getSource() == iniciar) {
+
+                palabras.setText("Memoriza las siguientes palabras:");
+                timer1.start();
+                timer3.stop();
+                indicadorNivel.setVisible(false);
+                controlWord = new Words(nombredeUsuario.getText());
+                iniciar.setVisible(false);
+                si.setVisible(false);
+                no.setVisible(false);
+                areaPuntaje.setVisible(true);
+                instrucciones.setVisible(false);
+                palabras.setVisible(true);
+
+
+                System.out.println("Correctas " + controlWord.getPalabrasCorrectas());
+                System.out.println("------------------------------------------");
+                System.out.println("Incorrectas " + controlWord.getPalabrasIncorrectas());
+                System.out.println("------------------------------------------");
+                System.out.println("Combinada " + controlWord.getListaCombinada());
+                System.out.println("---------------------------------------------");
+                areaPuntaje.setText("Nivel: " + controlWord.getNivel()+"\n"+
+                        "Aciertos: 0");
+
+            }
+            if (e.getSource() == timer1) {
+                timer1.stop();
+                timer3.stop();
+                timerRecordar.start();
+            }
+            if (e.getSource() == timerRecordar) {
+                if (counter < controlWord.getPalabrasCorrectas().size()) {
+                    palabras.setText(controlWord.getPalabrasCorrectas().get(counter));
+                    counter++;
+                } else {
+                    timerRecordar.stop();
+                    counter = 0;
+                    si.setEnabled(false);
+                    no.setEnabled(false);
+                    timer2.start();
                 }
-                this.currentWord = palabras[index[0]];
-                label.setText(palabras[index[0]]);
-                index[0]++;
-            } else {
-                button.setEnabled(true);
-                ((Timer) e.getSource()).stop(); // Detener el Timer cuando se hayan mostrado todas las palabras
             }
-        });
-        timer.start();
-    }
+            if (e.getSource() == timer2) {
+                palabras.setText("Preparate");
+                si.setVisible(true);
+                no.setVisible(true);
+                timer2.stop();
+                timerAdivinar.start();
+                counter=0;
+            }
+            if (e.getSource() == timerAdivinar){
+                si.setEnabled(true);
+                no.setEnabled(true);
 
-    private void cambioPantalla(){
-        this.correcto.setEnabled(true);
-        this.labelMain.setText("");
-        this.contenedorPalabras.setBorder(BorderFactory.createTitledBorder("Que palabra recuerdas:"));
-        String[] palabras = {"hola","como","pero","cosa","televisor","casa","carro","moto"};
-        temporizador(this.labelMain,7000,palabras,this.nextLevel);
-        System.out.println("El botón ha sido clickeado");
-        System.out.println("El botón ha sido cslickeado2");
+                if (counter < controlWord.getListaCombinada().size()) {
+                    palabras.setText(controlWord.getListaCombinada().get(counter));
+                    counter++;
+                }else{
+                    timerAdivinar.stop();
+                    si.setEnabled(false);
+                    no.setEnabled(false);
+                    controlWord.resultadoNivel();
+                    areaPuntaje.setText("Nivel: " + controlWord.getNivel()+"\n"+
+                            "Aciertos: "+ controlWord.getAciertos());
+                    timer3.start();
+                }
+            }
+            if (e.getSource()==si){
+                si.setEnabled(false);
+                no.setEnabled(false);
+                String palabraMostrada = palabras.getText();
 
-    }
+                if(controlWord.getPalabrasCorrectas().contains(palabraMostrada)){
+                    controlWord.setAciertos(controlWord.getAciertos()+1);
+                    areaPuntaje.setText("Nivel: " + controlWord.getNivel()+"\n"+
+                            "Aciertos: "+ controlWord.getAciertos());
+                    System.out.println(controlWord.getAciertos());
+                }
+            }if (e.getSource()==no){
+                si.setEnabled(false);
+                no.setEnabled(false);
+                String palabraMostrada = palabras.getText();
+                if(controlWord.getPalabrasIncorrectas().contains(palabraMostrada)) {
+                    controlWord.setAciertos(controlWord.getAciertos() + 1);
+                    areaPuntaje.setText("Nivel: " + controlWord.getNivel()+"\n"+
+                            "Aciertos: "+ controlWord.getAciertos());
 
-    private void calcularPuntaje(){
-        String[] palabrasCorrectas = this.palabrasCorrectas;
-        String currentWord = this.currentWord;
+                    System.out.println(controlWord.getAciertos());
+                }
+            }if (e.getSource()==timer3){
+                counter=0;
+                indicadorNivel.setText("Click en iniciar para intentar el nivel");
+                palabras.setVisible(false);
+                si.setVisible(false);
+                no.setVisible(false);
+                areaPuntaje.setVisible(false);
+                indicadorNivel.setVisible(true);
+                iniciar.setVisible(true);
 
-        for ( String palabra : palabrasCorrectas) {
-            if (palabra.equals(currentWord)) {
-                this.puntaje++;
-                System.out.println(this.puntaje);
             }
         }
     }
-    private void validarPuntaje(){
-        int maxPuntaje = this.palabrasCorrectas.length;
-        int minPuntaje = (int) (maxPuntaje * 0.7);
-        System.out.println(minPuntaje);
-        if (this.puntaje >= minPuntaje){
-            System.out.println("GANASTE");
-        }
-        else {
-            System.out.println("PERDISTE");
-        }
-
-    }
-
-    public String[] obtenerPalabrasCorrectas() {
-        words = new Words();
-        int level = 1;
-        String[] palabras = words.getWords(level);
-
-        return palabras ;
-        }
 }
