@@ -34,7 +34,7 @@ public class GUI extends JFrame {
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.getContentPane().setBackground(new Color(71,120,177));
+        this.getContentPane().setBackground(new Color(190, 204, 62));
         //this.setLayout(new GridBagLayout());
 
     }
